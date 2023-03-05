@@ -1,0 +1,57 @@
+{
+  "name": "mia-root",
+  "private": true,
+  "license": "MIT",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brody715/Mia.git"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "pnpm": ">=6.0.0"
+  },
+  "keywords": [],
+  "author": {
+    "name": "brody715",
+    "email": "brody71517@gmail.com"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@types/node": "^18.14.5",
+    "prettier": "^2.8.4",
+    "turbo": "^1.8.3",
+    "typescript": "^4.9.3",
+    "unbuild": "^1.1.2"
+  },
+  "turbo": {
+    "npmClient": "pnpm",
+    "pipeline": {
+      "build": {
+        "dependsOn": [
+          "^build"
+        ],
+        "outputs": [
+          "dist/**",
+          ".umi/**",
+          ".next/**"
+        ]
+      },
+      "deploy": {
+        "dependsOn": [
+          "build"
+        ]
+      },
+      "dev": {
+        "cache": false
+      }
+    }
+  }
+}

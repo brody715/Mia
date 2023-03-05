@@ -1,0 +1,5 @@
+# see https://developers.cloudflare.com/workers/wrangler/configuration/
+name = "mia-proxy-worker"
+main = "src/index.ts"
+compatibility_date = "2022-07-12"
+route = { pattern = "mia.brody715.com/mia_proxy/*", zone_name = "brody715.com" }
