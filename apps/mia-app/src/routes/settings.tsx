@@ -5,12 +5,15 @@ import { shallow } from '../stores'
 
 import { Formik, Form, Field } from 'formik'
 import { TextField } from 'formik-mui'
+import { useSnackbar } from 'notistack'
 
 export function SettingsPage() {
   const [apiClient, setOpenaiProfile] = useSettingsStore(
     (s) => [s.apiClient, s.setOpenaiProfile],
     shallow
   )
+
+  const { enqueueSnackbar } = useSnackbar()
 
   return (
     <Box>
@@ -28,6 +31,15 @@ export function SettingsPage() {
               apiKey: data.openai_apikey,
             })
             setSubmitting(false)
+
+            enqueueSnackbar('Settings saved', {
+              variant: 'success',
+              autoHideDuration: 1000,
+              anchorOrigin: {
+                vertical: 'top',
+                horizontal: 'center',
+              },
+            })
           }}
         >
           {({ submitForm, resetForm, isSubmitting }) => (

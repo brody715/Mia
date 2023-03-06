@@ -117,9 +117,9 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
           pt: '12px',
         }}
       >
-        {/* Workaround, use dummy div */}
-        <Box sx={{ height: '50px' }}></Box>
         <ScrollToBottom initialScrollBehavior="smooth">
+          {/* Workaround, use dummy div */}
+          <Box sx={{ height: '50px' }}></Box>
           {/* <ScrollToBottomButton /> */}
           <List sx={{ maxHeight: '80vh' }}>
             {chat.messages
@@ -144,7 +144,7 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
           width: '100%',
           position: 'absolute',
           left: 0,
-          mb: isMobile ? '12px' : '40px',
+          mb: isMobile ? '12px' : '34px',
           bottom: 0,
         }}
       >

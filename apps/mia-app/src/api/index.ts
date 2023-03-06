@@ -81,9 +81,10 @@ export class OpenAIClient {
     })
 
     if (!resp.ok) {
+      const text = await resp.text()
       return {
         ok: false,
-        error: new ApiClientError(`failed to request, erro=${resp.text}`),
+        error: new ApiClientError(`failed to request, erro=${text}`),
       }
     }
 
