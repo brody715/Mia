@@ -33,11 +33,10 @@ export interface CreateChatCompletionsReplyEventData {
   created: number
   choices: {
     delta: {
-      role: string
-      content: string
+      role?: string
+      content?: string
     }
     index: number
-    message: ChatCompletionMessage
     finish_reason: 'length' | 'stop' | 'timeout'
   }[]
 }

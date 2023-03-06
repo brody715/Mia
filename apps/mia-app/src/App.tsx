@@ -1,4 +1,5 @@
 import { CssBaseline } from '@mui/material'
+import { SnackbarProvider } from 'notistack'
 import { createHashRouter, RouterProvider, Navigate } from 'react-router-dom'
 import CharacterListPage from './routes/characters'
 import { ChatPage } from './routes/chat'
@@ -40,7 +41,9 @@ const router = createHashRouter([
 function App() {
   return (
     <CssBaseline>
-      <RouterProvider router={router} />
+      <SnackbarProvider maxSnack={3}>
+        <RouterProvider router={router} />
+      </SnackbarProvider>
     </CssBaseline>
   )
 }

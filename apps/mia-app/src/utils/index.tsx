@@ -20,3 +20,11 @@ export function makeDataCreator<T extends object>(
     return _.mergeWith({}, defaultValue, ...defaultValues)
   }
 }
+
+export function formatErrorUserFriendly(error: unknown) {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return `${error}`
+}

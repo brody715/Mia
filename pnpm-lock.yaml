@@ -28,6 +28,7 @@ importers:
       '@types/mockjs': ^1.0.7
       '@types/react': ^18.0.27
       '@types/react-dom': ^18.0.10
+      '@types/react-scroll-to-bottom': ^4.2.0
       '@vitejs/plugin-react': ^3.1.0
       add: ^2.0.6
       ahooks: ^3.7.5
@@ -37,11 +38,14 @@ importers:
       immer: ^9.0.19
       lodash-es: ^4.17.21
       mockjs: ^1.1.0
+      notistack: ^2.0.8
       react: ^18.2.0
       react-dom: ^18.2.0
       react-router-dom: ^6.8.2
+      react-scroll-to-bottom: ^4.2.0
       rollup: ^3.18.0
       short-unique-id: ^4.4.4
+      tiny-warning: ^1.0.3
       typescript: ^4.9.3
       vite: ^4.1.0
       vite-plugin-mock: ^2.9.6
@@ -57,19 +61,23 @@ importers:
       ahooks: 3.7.5_react@18.2.0
       axios: 1.3.4
       formik: 2.2.9_react@18.2.0
-      formik-mui: 5.0.0-alpha.0_l5mxjga2gp4w3a5h2nipplwoh4
+      formik-mui: 5.0.0-alpha.0_ta7vpmn4orxlopi47bvfgfbjvq
       immer: 9.0.19
       lodash-es: 4.17.21
+      notistack: 2.0.8_igc4uct3vur6mnmpd3oer3xfp4
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-router-dom: 6.8.2_biqbaboplfbrettd7655fr4n2y
+      react-scroll-to-bottom: 4.2.0_react@18.2.0
       short-unique-id: 4.4.4
+      tiny-warning: 1.0.3
       zustand: 4.3.5_immer@9.0.19+react@18.2.0
     devDependencies:
       '@faker-js/faker': 7.6.0
       '@types/mockjs': 1.0.7
       '@types/react': 18.0.28
       '@types/react-dom': 18.0.11
+      '@types/react-scroll-to-bottom': 4.2.0
       '@vitejs/plugin-react': 3.1.0_vite@4.1.4
       add: 2.0.6
       mockjs: 1.1.0
@@ -289,6 +297,14 @@ packages:
       '@babel/helper-plugin-utils': 7.20.2
     dev: true
 
+  /@babel/runtime-corejs3/7.21.0:
+    resolution: {integrity: sha512-TDD4UJzos3JJtM+tHX+w2Uc+KWj7GV+VKKFdMVd2Rx8sdA19hcc3P3AHFYd5LVOw+pYuSd5lICC3gm52B6Rwxw==}
+    engines: {node: '>=6.9.0'}
+    dependencies:
+      core-js-pure: 3.29.0
+      regenerator-runtime: 0.13.11
+    dev: false
+
   /@babel/runtime/7.21.0:
     resolution: {integrity: sha512-xwII0//EObnq89Ji5AKYQaRYiW/nZ3llSv29d49IuxPhKbtJoLP+9QUUZ4nVragQVtaVGeZrpB+ZtG/Pdy/POw==}
     engines: {node: '>=6.9.0'}
@@ -366,6 +382,21 @@ packages:
       '@emotion/utils': 1.2.0
       '@emotion/weak-memoize': 0.3.0
       stylis: 4.1.3
+    dev: false
+
+  /@emotion/css/11.1.3:
+    resolution: {integrity: sha512-RSQP59qtCNTf5NWD6xM08xsQdCZmVYnX/panPYvB6LQAPKQB6GL49Njf0EMbS3CyDtrlWsBcmqBtysFvfWT3rA==}
+    peerDependencies:
+      '@babel/core': ^7.0.0
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+    dependencies:
+      '@emotion/babel-plugin': 11.10.6
+      '@emotion/cache': 11.10.5
+      '@emotion/serialize': 1.1.1
+      '@emotion/sheet': 1.2.1
+      '@emotion/utils': 1.2.0
     dev: false
 
   /@emotion/hash/0.9.0:
@@ -1716,6 +1747,12 @@ packages:
       '@types/react': 18.0.28
     dev: false
 
+  /@types/react-scroll-to-bottom/4.2.0:
+    resolution: {integrity: sha512-CE8GnRIFl4CRYlnHikVwJcHj4WOFBbgclbs1LNlqooVGYSBfrRvig3C3aVKDUkiXQYpp0i2p8OPUMO1JvlrZ5Q==}
+    dependencies:
+      '@types/react': 18.0.28
+    dev: true
+
   /@types/react-transition-group/4.4.5:
     resolution: {integrity: sha512-juKD/eiSM3/xZYzjuzH6ZwpP+/lejltmiS3QEzV/vmb/Q8+HfDmxu+Baga8UEMGBqV88Nbg4l2hY/K2DkyaLLA==}
     dependencies:
@@ -1982,6 +2019,10 @@ packages:
       fsevents: 2.3.2
     dev: true
 
+  /classnames/2.3.1:
+    resolution: {integrity: sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==}
+    dev: false
+
   /clsx/1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
     engines: {node: '>=6'}
@@ -2049,6 +2090,17 @@ packages:
     resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
     engines: {node: '>= 0.6'}
     dev: true
+
+  /core-js-pure/3.29.0:
+    resolution: {integrity: sha512-v94gUjN5UTe1n0yN/opTihJ8QBWD2O8i19RfTZR7foONPWArnjB96QA/wk5ozu1mm6ja3udQCzOzwQXTxi3xOQ==}
+    requiresBuild: true
+    dev: false
+
+  /core-js/3.18.3:
+    resolution: {integrity: sha512-tReEhtMReZaPFVw7dajMx0vlsz3oOb8ajgPoHVYGxr8ErnZ6PcYEvvmjGmXlfpnxpkYSdOQttjB+MvVbCGfvLw==}
+    deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
+    requiresBuild: true
+    dev: false
 
   /cosmiconfig/7.1.0:
     resolution: {integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==}
@@ -2391,7 +2443,7 @@ packages:
       mime-types: 2.1.35
     dev: false
 
-  /formik-mui/5.0.0-alpha.0_l5mxjga2gp4w3a5h2nipplwoh4:
+  /formik-mui/5.0.0-alpha.0_ta7vpmn4orxlopi47bvfgfbjvq:
     resolution: {integrity: sha512-tcY8B4I3N2UK9ghgVpeBWsXGMDe1y4LVKwI8GiUbLKGB86fI/CN9UMr4FuNo6kzNXvO42LFNmCxdEVzovNCyYQ==}
     peerDependencies:
       '@emotion/react': '>=11.5.0'
@@ -2406,6 +2458,7 @@ packages:
       '@mui/material': 5.11.11_xqeqsl5kvjjtyxwyi3jhw3yuli
       formik: 2.2.9_react@18.2.0
       react: 18.2.0
+      tiny-warning: 1.0.3
     dev: false
 
   /formik/2.2.9_react@18.2.0:
@@ -2787,6 +2840,10 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
+  /math-random/2.0.1:
+    resolution: {integrity: sha512-oIEbWiVDxDpl5tIF4S6zYS9JExhh3bun3uLb3YAinHPTlRtW4g1S66LtJrJ4Npq8dgIa8CLK5iPVah5n4n0s2w==}
+    dev: false
+
   /merge-stream/2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
     dev: true
@@ -2987,6 +3044,29 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
+  /notistack/2.0.8_igc4uct3vur6mnmpd3oer3xfp4:
+    resolution: {integrity: sha512-/IY14wkFp5qjPgKNvAdfL5Jp6q90+MjgKTPh4c81r/lW70KeuX6b9pE/4f8L4FG31cNudbN9siiFS5ql1aSLRw==}
+    peerDependencies:
+      '@emotion/react': ^11.4.1
+      '@emotion/styled': ^11.3.0
+      '@mui/material': ^5.0.0
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+    peerDependenciesMeta:
+      '@emotion/react':
+        optional: true
+      '@emotion/styled':
+        optional: true
+    dependencies:
+      '@emotion/react': 11.10.6_pmekkgnqduwlme35zpnqhenc34
+      '@emotion/styled': 11.10.6_oouaibmszuch5k64ms7uxp2aia
+      '@mui/material': 5.11.11_xqeqsl5kvjjtyxwyi3jhw3yuli
+      clsx: 1.2.1
+      hoist-non-react-statics: 3.3.2
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /npm-run-path/5.1.0:
     resolution: {integrity: sha512-sJOdmRGrY2sjNTRMbSvluQqg+8X7ZK61yvzBEIDhz4f8z1TZFYABsqjjCBd/0PUNE9M6QDgHJXQkGUEm7Q+l9Q==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
@@ -3116,6 +3196,14 @@ packages:
     engines: {node: ^14.13.1 || >=16.0.0}
     dev: true
 
+  /prop-types/15.7.2:
+    resolution: {integrity: sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==}
+    dependencies:
+      loose-envify: 1.4.0
+      object-assign: 4.1.1
+      react-is: 16.13.1
+    dev: false
+
   /prop-types/15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
     dependencies:
@@ -3184,6 +3272,23 @@ packages:
     dependencies:
       '@remix-run/router': 1.3.3
       react: 18.2.0
+    dev: false
+
+  /react-scroll-to-bottom/4.2.0_react@18.2.0:
+    resolution: {integrity: sha512-1WweuumQc5JLzeAR81ykRdK/cEv9NlCPEm4vSwOGN1qS2qlpGVTyMgdI8Y7ZmaqRmzYBGV5/xPuJQtekYzQFGg==}
+    peerDependencies:
+      react: '>= 16.8.6'
+    dependencies:
+      '@babel/runtime-corejs3': 7.21.0
+      '@emotion/css': 11.1.3
+      classnames: 2.3.1
+      core-js: 3.18.3
+      math-random: 2.0.1
+      prop-types: 15.7.2
+      react: 18.2.0
+      simple-update-in: 2.2.0
+    transitivePeerDependencies:
+      - '@babel/core'
     dev: false
 
   /react-transition-group/4.4.5_biqbaboplfbrettd7655fr4n2y:
@@ -3363,6 +3468,10 @@ packages:
   /signal-exit/3.0.7:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}
     dev: true
+
+  /simple-update-in/2.2.0:
+    resolution: {integrity: sha512-FrW41lLiOs82jKxwq39UrE1HDAHOvirKWk4Nv8tqnFFFknVbTxcHZzDS4vt02qqdU/5+KNsQHWzhKHznDBmrww==}
+    dev: false
 
   /simple-update-notifier/1.1.0:
     resolution: {integrity: sha512-VpsrsJSUcJEseSbMHkrsrAVSdvVS5I96Qo1QAQ4FxQ9wXFcB+pjj7FB7/us9+GcgfW4ziHtYMc1J0PLczb55mg==}

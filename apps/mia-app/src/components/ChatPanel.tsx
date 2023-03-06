@@ -14,9 +14,12 @@ import { useDebounceFn, useMemoizedFn } from 'ahooks'
 import { useState } from 'react'
 import * as chat_t from '../stores/chat'
 import { useIsMobile } from '../hooks'
-import MoreDrawer from '../components/MoreDrawer'
 import { useChatStore } from '../stores/chat'
 import { shallow } from '../stores'
+import { useSnackbar } from 'notistack'
+import { formatErrorUserFriendly } from '../utils'
+import ScrollToBottom from 'react-scroll-to-bottom'
+import ScrollToBottomButton from './ScrollToBottomButton'
 
 function ChatMessageItem(props: {
   message: chat_t.ChatMessage
@@ -53,8 +56,14 @@ function ChatMessageItem(props: {
 export function ChatPanel(props: { chat: chat_t.Chat }) {
   const { chat } = props
 
-  const [sendChatMessage] = useChatStore((s) => [s.sendChatMessage], shallow)
+  const [sendChatMessage, sendChatMessageStream] = useChatStore(
+    (s) => [s.sendChatMessage, s.sendChatMessageStream],
+    shallow
+  )
   const [text, setText] = useState('')
+  const [sending, setSending] = useState(false)
+
+  const { enqueueSnackbar } = useSnackbar()
 
   const isMobile = useIsMobile()
 
@@ -64,10 +73,26 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
         return
       }
 
-      await sendChatMessage({
-        chatId: chat.id,
-        content: text,
-      })
+      setSending(true)
+      try {
+        const res = await sendChatMessageStream({
+          chatId: chat.id,
+          content: text,
+        })
+
+        if (!res.ok) {
+          enqueueSnackbar(formatErrorUserFriendly(res.error), {
+            autoHideDuration: 3000,
+            variant: 'error',
+            anchorOrigin: {
+              vertical: 'top',
+              horizontal: 'center',
+            },
+          })
+        }
+      } finally {
+        setSending(false)
+      }
 
       setText('')
     },
@@ -85,26 +110,29 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
   )
 
   return (
-    <Box>
+    <Box aria-label="chat-panel">
       <Box
         sx={{
           width: '100%',
           pt: '12px',
         }}
       >
-        <List sx={{ height: '100%' }}>
-          {/* Workaround, use dummy div */}
-          <Box sx={{ height: '50px' }}></Box>
-          {chat.messages
-            .filter((msg) => msg.role != 'system')
-            .map((message) => (
-              <ChatMessageItem
-                key={message.id}
-                message={message}
-                character={chat.character}
-              />
-            ))}
-        </List>
+        {/* Workaround, use dummy div */}
+        <Box sx={{ height: '50px' }}></Box>
+        <ScrollToBottom initialScrollBehavior="smooth">
+          {/* <ScrollToBottomButton /> */}
+          <List sx={{ maxHeight: '80vh' }}>
+            {chat.messages
+              .filter((msg) => msg.role != 'system')
+              .map((message) => (
+                <ChatMessageItem
+                  key={message.id}
+                  message={message}
+                  character={chat.character}
+                />
+              ))}
+          </List>
+        </ScrollToBottom>
         {/* Workaround, use dummy div */}
         <Box sx={{ height: isMobile ? '50px' : '80px' }}></Box>
       </Box>
@@ -136,13 +164,17 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
             onChange={(e) => setText(e.target.value)}
             multiline={true}
             onKeyDown={handleInputShortcut}
+            disabled={sending}
           />
-          <IconButton onClick={handleSendMessage} sx={{ p: '10px' }}>
+          <IconButton
+            onClick={handleSendMessage}
+            sx={{ p: '10px' }}
+            disabled={sending}
+          >
             <SendIcon />
           </IconButton>
         </Paper>
       </Box>
-      <MoreDrawer />
     </Box>
   )
 }

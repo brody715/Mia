@@ -48,9 +48,11 @@ export function DrawerChatList() {
 
   const handleCreateChat = useMemoizedFn(() => {
     const chara = getRandomCharacter()
-    createChat({
+    const chat = createChat({
       character: chara,
     })
+
+    navigate(`/chats/${chat.id}`, { replace: false })
   })
 
   const handleSelectChat = useMemoizedFn((id: string) => {

@@ -67,11 +67,16 @@ interface ChatStoreActions {
 
   getRandomCharacter(): Character
 
-  createChat(p: { name?: string; character: Character }): void
+  createChat(p: { name?: string; character: Character }): Chat
 
   deleteChat(id: string): void
 
   sendChatMessage(p: {
+    chatId: string
+    content: string
+  }): Promise<Result<boolean>>
+
+  sendChatMessageStream(p: {
     chatId: string
     content: string
   }): Promise<Result<boolean>>
@@ -230,6 +235,86 @@ function createChatStore() {
           ...choice.message,
         })
       })
+
+      return { ok: true, value: true }
+    },
+
+    async sendChatMessageStream(p: {
+      chatId: string
+      content: string
+    }): Promise<Result<boolean>> {
+      const chat = get().chats.find((c) => c.id === p.chatId)
+
+      if (!chat) {
+        throw new Error(`chat not found, id: ${p.chatId}`)
+      }
+
+      const userMessage: api_t.ChatCompletionMessage = {
+        role: 'user',
+        content: p.content,
+      }
+
+      const messages = postprocessMessages({
+        historyMessages: chat.messages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        newMessage: userMessage,
+        mustHaveMessages: chat.mustHaveMessages,
+      })
+
+      const openaiClient = getOpenaiClient()
+
+      set((s) => {
+        const chat = s.chats.find((c) => c.id === p.chatId)
+        if (!chat) {
+          return
+        }
+
+        // push user message to history
+        chat.messages.push({
+          id: idGenerator.randomUUID(8),
+          created: Date.now(),
+          ...userMessage,
+        })
+
+        // push reply message to history
+        chat.messages.push({
+          id: idGenerator.randomUUID(8),
+          created: Date.now(),
+          role: 'assistant',
+          content: '',
+        })
+      })
+
+      const handleStream = (
+        events: api_t.CreateChatCompletionsReplyEventData[]
+      ) => {
+        set((s) => {
+          const chat = s.chats.find((c) => c.id === p.chatId)
+          if (!chat) {
+            return
+          }
+
+          let newContent = ''
+
+          for (const event of events) {
+            newContent += event.choices[0].delta.content || ''
+          }
+
+          // push replies to history
+          chat.messages[chat.messages.length - 1].content += newContent
+        })
+      }
+
+      const resp = await openaiClient.createChatCompletionsStream(
+        { model: 'gpt-3.5-turbo', messages },
+        handleStream
+      )
+
+      if (!resp.ok) {
+        return { ok: false, error: resp.error }
+      }
 
       return { ok: true, value: true }
     },

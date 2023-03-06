@@ -2,6 +2,7 @@ export * as api_t from './types'
 import * as api_t from './types'
 import axios, { AxiosInstance } from 'axios'
 import { Result } from '../types'
+import { formatErrorUserFriendly } from '../utils'
 
 export class ApiClientError extends Error {}
 
@@ -18,7 +19,7 @@ export class OpenAIClient {
       baseURL: opts.endpoint,
     })
 
-    console.log(`Create OpenAI client with endpoint=${opts.endpoint}`)
+    // console.log(`Create OpenAI client with endpoint=${opts.endpoint}`)
   }
 
   async checkApiKeyValid(): Promise<boolean> {
@@ -69,27 +70,24 @@ export class OpenAIClient {
   ): Promise<Result<boolean>> {
     const headers = this.getHeaders()
 
-    const resp = await this.httpClient.post(
-      '/v1/chat/completions',
-      {
+    // encounter problem when use stream in axios
+    const resp = await fetch(`${this.opts.endpoint}/v1/chat/completions`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
         ...req,
         stream: true,
-      },
-      {
-        headers,
-        responseType: 'stream',
-        transformResponse: (r) => r,
-      }
-    )
+      }),
+    })
 
-    if (resp.status !== 200) {
+    if (!resp.ok) {
       return {
         ok: false,
-        error: new ApiClientError(`failed to request, erro=${resp.data}`),
+        error: new ApiClientError(`failed to request, erro=${resp.text}`),
       }
     }
 
-    const stream: ReadableStream<Uint8Array> | null = resp.data
+    const stream: ReadableStream<Uint8Array> | null = resp.body
 
     if (stream) {
       try {
@@ -125,9 +123,14 @@ export class OpenAIClient {
       } catch (e) {
         return {
           ok: false,
-          error: new ApiClientError(`encouter error when parse stream, err`, {
-            cause: e,
-          }),
+          error: new ApiClientError(
+            `encouter error when parse stream, err=${formatErrorUserFriendly(
+              e
+            )}`,
+            {
+              cause: e,
+            }
+          ),
         }
       }
     }
@@ -148,12 +151,8 @@ export class OpenAIClient {
           .map((line) => line.replace(/^data: /, ''))
           .join('')
         if (jsonString === '[DONE]') return jsonString
-        try {
-          const json = JSON.parse(jsonString)
-          return json
-        } catch {
-          return '[ERROR]'
-        }
+        const json = JSON.parse(jsonString)
+        return json
       })
     return result
   }
