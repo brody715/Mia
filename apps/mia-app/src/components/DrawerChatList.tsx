@@ -14,37 +14,20 @@ import {
   IconButton,
 } from '@mui/material'
 import { useMemoizedFn } from 'ahooks'
-import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useCurrentChatId } from '../hooks'
 import { shallow } from '../stores'
 import { useChatStore } from '../stores/chat'
 
 export function DrawerChatList() {
-  const [
-    chats,
-    currentChatId,
-    setCurrentChatId,
-    getRandomCharacter,
-    createChat,
-    deleteChat,
-  ] = useChatStore(
-    (s) => [
-      s.chats,
-      s.currentChatId,
-      s.setCurrentChatId,
-      s.getRandomCharacter,
-      s.createChat,
-      s.deleteChat,
-    ],
+  const [getRandomCharacter, createChat, deleteChat] = useChatStore(
+    (s) => [s.getRandomCharacter, s.createChat, s.deleteChat],
     shallow
   )
 
-  const sortedChats = useMemo(() => {
-    const sortedChats = [...chats]
-    return sortedChats.reverse()
-  }, [chats])
-
+  const currentChatId = useCurrentChatId()
   const navigate = useNavigate()
+  const sortedChats = useChatStore((s) => s.listChats({ sortBy: 'updatedAt' }))
 
   const handleCreateChat = useMemoizedFn(() => {
     const chara = getRandomCharacter()

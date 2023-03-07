@@ -152,9 +152,16 @@ export class OpenAIClient {
           .map((line) => line.replace(/^data: /, ''))
           .join('')
         if (jsonString === '[DONE]') return jsonString
-        const json = JSON.parse(jsonString)
-        return json
+        try {
+          const json = JSON.parse(jsonString)
+          return json
+        } catch (e) {
+          console.warn(`failed to parse json, err=${e}, data=${jsonString}`)
+          return null
+        }
       })
+      .filter(Boolean)
+
     return result
   }
 

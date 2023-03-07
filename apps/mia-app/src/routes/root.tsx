@@ -10,7 +10,7 @@ function Main({
   mainDrawerWidth,
   children,
 }: {
-  children: React.ReactElement
+  children: React.ReactNode
   mainDrawerWidth: number
 }) {
   const theme = useTheme()
@@ -56,7 +56,10 @@ export default function RootPage() {
     >
       <MainDrawer width={drawerWidth} />
       <Main mainDrawerWidth={drawerWidth}>
-        <Outlet />
+        {/* mt is AppBar's height */}
+        <Box sx={{ mt: '56px' }}>
+          <Outlet />
+        </Box>
       </Main>
       <MoreDrawer />
     </Box>

@@ -31,6 +31,9 @@ export interface Chat {
     completionTokens: number
     totalTokens: number
   }
+  // ISO 8601
+  createdAt: string
+  updatedAt: string
 }
 
 const createChatData = makeDataCreator<Chat>({
@@ -48,6 +51,8 @@ const createChatData = makeDataCreator<Chat>({
     completionTokens: 0,
     totalTokens: 0,
   },
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 })
 
 interface ChatStoreState {
@@ -55,26 +60,23 @@ interface ChatStoreState {
   characters: Character[]
   // use for naming new chats
   chatNextIndex: number
-  currentChatId: string
 }
 
 interface ChatStoreActions {
-  getCurrentChat(): Chat | undefined
-
   getChat(id: string): Chat | undefined
-
-  setCurrentChatId(id: string): void
 
   getRandomCharacter(): Character
 
+  listChats(p: {
+    sortBy?: 'createdAt' | 'updatedAt'
+    order?: 'asc' | 'desc'
+  }): Chat[]
+
   createChat(p: { name?: string; character: Character }): Chat
 
-  deleteChat(id: string): void
+  updateChat(id: string, p: { name?: string }): void
 
-  sendChatMessage(p: {
-    chatId: string
-    content: string
-  }): Promise<Result<boolean>>
+  deleteChat(id: string): void
 
   sendChatMessageStream(p: {
     chatId: string
@@ -113,22 +115,45 @@ function createChatStore() {
     chats: [],
     characters: [],
     chatNextIndex: 1,
-    currentChatId: '',
-
-    // computed value
-    getCurrentChat: () => {
-      const chats = get().chats
-      const currentChatId = get().currentChatId
-      return chats.find((chat) => chat.id === currentChatId)
-    },
 
     getChat(id: string): Chat | undefined {
       const chat = get().chats.find((c) => c && c.id === id)
       return chat
     },
 
-    setCurrentChatId: (id: string) => {
-      set({ currentChatId: id })
+    listChats(p) {
+      const { sortBy = 'createdAt', order = 'desc' } = p
+
+      const chats = [...get().chats].sort((a, b) => {
+        const lhs = a[sortBy]
+        const rhs = b[sortBy]
+
+        if (lhs < rhs) {
+          return order === 'asc' ? -1 : 1
+        }
+        if (lhs > rhs) {
+          return order === 'asc' ? 1 : -1
+        }
+        return 0
+      })
+
+      return chats
+    },
+
+    updateChat(
+      id: string,
+      p: {
+        name?: string
+      }
+    ) {
+      set((s) => {
+        const chat = s.chats.find((c) => c && c.id === id)
+        if (chat) {
+          if (p.name) {
+            chat.name = p.name
+          }
+        }
+      })
     },
 
     getRandomCharacter(): Character {
@@ -175,68 +200,6 @@ function createChatStore() {
       set((state) => {
         state.chats = state.chats.filter((chat) => chat.id !== id)
       })
-    },
-
-    async sendChatMessage(p: {
-      chatId: string
-      content: string
-    }): Promise<Result<boolean>> {
-      const chat = get().chats.find((c) => c.id === p.chatId)
-
-      if (!chat) {
-        throw new Error(`chat not found, id: ${p.chatId}`)
-      }
-
-      const userMessage: api_t.ChatCompletionMessage = {
-        role: 'user',
-        content: p.content,
-      }
-
-      const messages = postprocessMessages({
-        historyMessages: chat.messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
-        newMessage: userMessage,
-        mustHaveMessages: chat.mustHaveMessages,
-      })
-
-      const openaiClient = getOpenaiClient()
-
-      const resp = await openaiClient.createChatCompletions({
-        model: 'gpt-3.5-turbo',
-        messages,
-      })
-
-      if (!resp.ok) {
-        return { ok: false, error: resp.error }
-      }
-
-      set((s) => {
-        // Notice: you should find chatIdx first, and the use s.chats[chatIdx] to modify state
-        const chatIdx = s.chats.findIndex((c) => c.id === p.chatId)
-
-        if (chatIdx == -1) {
-          return
-        }
-
-        // push user message to history
-        s.chats[chatIdx].messages.push({
-          id: idGenerator.randomUUID(8),
-          created: Date.now(),
-          ...userMessage,
-        })
-
-        // push replies to history
-        const choice = resp.value.choices[0]
-        s.chats[chatIdx].messages.push({
-          id: idGenerator.randomUUID(8),
-          created: Date.now(),
-          ...choice.message,
-        })
-      })
-
-      return { ok: true, value: true }
     },
 
     async sendChatMessageStream(p: {
