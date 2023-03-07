@@ -19,45 +19,13 @@ import { shallow } from '../stores'
 import { useSnackbar } from 'notistack'
 import { formatErrorUserFriendly } from '../utils'
 import ScrollToBottom from 'react-scroll-to-bottom'
-import ScrollToBottomButton from './ScrollToBottomButton'
-
-function ChatMessageItem(props: {
-  message: chat_t.ChatMessage
-  character: chat_t.Character
-}) {
-  const { message, character } = props
-
-  const isUser = message.role == 'user'
-
-  return (
-    <ListItem
-      sx={{
-        flexDirection: isUser ? 'row-reverse' : 'row',
-        justifyContent: isUser ? 'flex-end' : 'flex-start',
-        mb: '8px',
-        gap: '16px',
-        textAlign: isUser ? 'right' : 'left',
-      }}
-    >
-      <ListItemAvatar sx={{ minWidth: 0 }}>
-        <Avatar
-          sx={{
-            bgcolor: isUser ? 'primary.main' : 'secondary.main',
-          }}
-        >
-          {isUser ? 'U' : 'C'}{' '}
-        </Avatar>
-      </ListItemAvatar>
-      <ListItemText secondary={message.content}></ListItemText>
-    </ListItem>
-  )
-}
+import ChatMessageItem from './ChatMessageItem'
 
 export function ChatPanel(props: { chat: chat_t.Chat }) {
   const { chat } = props
 
-  const [sendChatMessage, sendChatMessageStream] = useChatStore(
-    (s) => [s.sendChatMessage, s.sendChatMessageStream],
+  const [sendChatMessageStream] = useChatStore(
+    (s) => [s.sendChatMessageStream],
     shallow
   )
   const [text, setText] = useState('')
@@ -110,31 +78,43 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
   )
 
   return (
-    <Box aria-label="chat-panel">
+    <Box
+      aria-label="chat-panel"
+      sx={{
+        display: 'flex',
+        height: '100vh',
+        flexDirection: 'column',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+      }}
+    >
       <Box
         sx={{
           width: '100%',
-          pt: '12px',
+          flexGrow: '1',
         }}
       >
         <ScrollToBottom initialScrollBehavior="smooth">
-          {/* Workaround, use dummy div */}
-          <Box sx={{ height: '50px' }}></Box>
           {/* <ScrollToBottomButton /> */}
-          <List sx={{ maxHeight: '80vh' }}>
+          <List sx={{ maxHeight: 'calc(100vh - 100px)' }}>
+            {/* Workaround, use dummy div */}
+            <Box sx={{ height: '80px' }}></Box>
             {chat.messages
               .filter((msg) => msg.role != 'system')
-              .map((message) => (
-                <ChatMessageItem
-                  key={message.id}
-                  message={message}
-                  character={chat.character}
-                />
-              ))}
+              .map((message, idx, total) => {
+                return (
+                  <ChatMessageItem
+                    key={message.id}
+                    isLastOne={idx == total.length - 1}
+                    message={message}
+                    character={chat.character}
+                  />
+                )
+              })}
           </List>
         </ScrollToBottom>
-        {/* Workaround, use dummy div */}
-        <Box sx={{ height: isMobile ? '50px' : '80px' }}></Box>
       </Box>
 
       {/* Input bar */}
@@ -142,10 +122,7 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
         sx={{
           px: '12px',
           width: '100%',
-          position: 'absolute',
-          left: 0,
-          mb: isMobile ? '12px' : '34px',
-          bottom: 0,
+          mb: isMobile ? '12px' : '24px',
         }}
       >
         <Paper

@@ -47,7 +47,7 @@ function ChatListItem({
 
   const handleCancelConfirm = (key: ChatItemAction) => {}
 
-  const { confirming, startConfirming, confirm, cancelConfirm } =
+  const { confirmingKey, confirming, startConfirming, confirm, cancelConfirm } =
     useDoubleConfirm<'delete' | 'edit'>({
       onConfirm: handleConfirm,
       onConfirmCanceled: handleCancelConfirm,

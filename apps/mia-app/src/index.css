@@ -1,0 +1,86 @@
+body,
+html {
+  height: 100vh;
+}
+
+p {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin: 0;
+}
+
+pre {
+  margin: 0;
+}
+
+.markdown ol,
+.markdown ul {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1rem;
+}
+
+.markdown ol li,
+.markdown ol li > p,
+.markdown ol ol,
+.markdown ol ul,
+.markdown ul li,
+.markdown ul li > p,
+.markdown ul ol,
+.markdown ul ul {
+  margin: 0;
+}
+
+.markdown ul li:before {
+  content: '•';
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  margin-left: -1rem;
+  position: absolute;
+}
+
+:not(pre) > code.hljs,
+:not(pre) > code[class*='language-'] {
+  border-radius: 0.3em;
+  white-space: normal;
+}
+.hljs-comment {
+  color: hsla(0, 0%, 100%, 0.5);
+}
+.hljs-meta {
+  color: hsla(0, 0%, 100%, 0.6);
+}
+.hljs-built_in,
+.hljs-class .hljs-title {
+  color: #e9950c;
+}
+.hljs-doctag,
+.hljs-formula,
+.hljs-keyword,
+.hljs-literal {
+  color: #2e95d3;
+}
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta-string,
+.hljs-regexp,
+.hljs-string {
+  color: #00a67d;
+}
+.hljs-attr,
+.hljs-number,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-pseudo,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable {
+  color: #df3079;
+}
+.hljs-bullet,
+.hljs-link,
+.hljs-selector-id,
+.hljs-symbol,
+.hljs-title {
+  color: #f22c3d;
+}

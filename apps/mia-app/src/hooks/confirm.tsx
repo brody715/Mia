@@ -11,15 +11,15 @@ export function useDoubleConfirm<Keys extends string | number>(opts: {
   onConfirmCanceled: (key: Keys) => void
 }) {
   const [confirming, setConfirming] = useState<boolean>(false)
-  const confirmKeyRef = useRef<Keys | null>()
+  const confirmingKeyRef = useRef<Keys | null>()
 
   const startConfirming = useMemoizedFn((key: Keys) => {
     setConfirming(true)
-    confirmKeyRef.current = key
+    confirmingKeyRef.current = key
   })
 
   const confirm = useMemoizedFn(() => {
-    const key = confirmKeyRef.current
+    const key = confirmingKeyRef.current
     if (key == null) {
       return
     }
@@ -29,10 +29,11 @@ export function useDoubleConfirm<Keys extends string | number>(opts: {
 
   const cancelConfirm = useMemoizedFn(() => {
     setConfirming(false)
-    confirmKeyRef.current = null
+    confirmingKeyRef.current = null
   })
 
   return {
+    confirmingKey: confirmingKeyRef.current,
     confirming,
     startConfirming,
     confirm,

@@ -7,6 +7,8 @@ import { useSettingsStore } from './settings'
 import ShortUniqueId from 'short-unique-id'
 import { Result } from '../types'
 
+export type ChatRole = 'user' | 'assistant' | 'system'
+
 export interface Character {
   id: string
   name: string
@@ -16,7 +18,7 @@ export interface Character {
 export interface ChatMessage {
   id: string
   created: number
-  role: api_t.ChatCompletionMessage['role']
+  role: ChatRole
   content: string
 }
 
@@ -274,6 +276,7 @@ function createChatStore() {
         { model: 'gpt-3.5-turbo', messages },
         handleStream
       )
+
 
       if (!resp.ok) {
         return { ok: false, error: resp.error }
