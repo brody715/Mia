@@ -8,6 +8,8 @@ import {
   ListItemAvatar,
   ListItemText,
   Paper,
+  Stack,
+  Toolbar,
   Typography,
 } from '@mui/material'
 import * as chat_t from '../stores/chat'
@@ -19,7 +21,13 @@ import remarkGfm from 'remark-gfm'
 import hljs from 'highlight.js'
 import DOMPurify from 'dompurify'
 import React, { useState } from 'react'
-import { CopyAll as CopyAllIcon, Done as DoneIcon } from '@mui/icons-material'
+import {
+  ContentCopy,
+  CopyAll as CopyAllIcon,
+  CopyAllRounded as CopyAllRoundedIcon,
+  Done as DoneIcon,
+  Refresh as RefreshIcon,
+} from '@mui/icons-material'
 
 const MessageContentView = React.memo(({ content }: { content: string }) => {
   const [codeCopied, setCodeCopied] = useState<boolean>(false)
@@ -119,6 +127,32 @@ const MessageContentView = React.memo(({ content }: { content: string }) => {
   )
 })
 
+function ChatActions({ content }: { content: string }) {
+  const [copied, setCopied] = useState<boolean>(false)
+  return (
+    <Stack direction="row-reverse" gap={2} marginTop={1} fontSize="14px">
+      <Button
+        size="small"
+        color="secondary"
+        onClick={() => {
+          navigator.clipboard.writeText(content).then(() => {
+            setCopied(true)
+            setTimeout(() => setCopied(false), 2000)
+          })
+        }}
+      >
+        {copied ? <DoneIcon /> : <CopyAllRoundedIcon />}
+        Copy Raw
+      </Button>
+
+      <Button size="small" color="warning">
+        <RefreshIcon />
+        Regenerate
+      </Button>
+    </Stack>
+  )
+}
+
 export default function ChatMessageItem(props: {
   isLastOne: boolean
   message: chat_t.ChatMessage
@@ -154,7 +188,7 @@ export default function ChatMessageItem(props: {
           borderRadius: '12px',
           backgroundColor: isUser ? '#1777ff' : '#f9f9fe',
           maxWidth: '580px',
-          // minWidth: '100px',
+          minWidth: '10px',
         }}
       >
         {waitingReceive ? (
@@ -162,7 +196,12 @@ export default function ChatMessageItem(props: {
         ) : (
           <MessageContentView content={message.content} />
         )}
-        {/* <Divider sx={{mt: '8px'}} /> */}
+        {!isUser && (
+          <>
+            <Divider sx={{ mt: '8px' }} />{' '}
+            <ChatActions content={message.content} />{' '}
+          </>
+        )}
       </Paper>
     </ListItem>
   )

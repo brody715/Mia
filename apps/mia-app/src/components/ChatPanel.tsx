@@ -25,7 +25,7 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
   const { chat } = props
 
   const [sendChatMessageStream] = useChatStore(
-    (s) => [s.sendChatMessageStream],
+    (s) => [s.sendNewMessageStream],
     shallow
   )
   const [text, setText] = useState('')
