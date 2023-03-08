@@ -84,7 +84,7 @@ const MessageContentView = React.memo(({ content }: { content: string }) => {
                 <Box
                   sx={{
                     padding: '8px 8px',
-                    overflowY: 'scroll',
+                    overflowY: 'auto',
                     border: '0px dashed gray',
                     borderTopWidth: '1px',
                     borderBottomWidth: '1px',

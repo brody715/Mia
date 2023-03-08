@@ -1,0 +1,37 @@
+name: Deploy to GitHub Pages
+
+# 触发条件，只有在 main 分支有代码合并或手动触发时才执行 Workflow
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install PNPM
+        run: npm install -g pnpm
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install
+
+      - name: Install App Dependencies
+        run: cd apps/mia-app && pnpm install
+
+      - name: Build App
+        run: cd apps/mia-app && pnpm run build
+
+      - name: Back To Root
+        run: cd ../..
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{secrets.GITHUB_TOKEN}}
+          publish_dir: ./apps/mia-app/dist
