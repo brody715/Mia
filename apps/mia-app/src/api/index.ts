@@ -70,15 +70,29 @@ export class OpenAIClient {
   ): Promise<Result<boolean>> {
     const headers = this.getHeaders()
 
-    // encounter problem when use stream in axios
-    const resp = await fetch(`${this.opts.endpoint}/v1/chat/completions`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        ...req,
-        stream: true,
-      }),
-    })
+    let resp: Response | undefined = undefined
+
+    try {
+      // encounter problem when use stream in axios
+      resp = await fetch(`${this.opts.endpoint}/v1/chat/completions`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          ...req,
+          stream: true,
+        }),
+      })
+    } catch (e) {
+      return {
+        ok: false,
+        error: new ApiClientError(
+          `encouter error when request, err=${formatErrorUserFriendly(e)}`,
+          {
+            cause: e,
+          }
+        ),
+      }
+    }
 
     if (!resp.ok) {
       const text = await resp.text()

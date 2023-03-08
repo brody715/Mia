@@ -24,8 +24,8 @@ import ChatMessageItem from './ChatMessageItem'
 export function ChatPanel(props: { chat: chat_t.Chat }) {
   const { chat } = props
 
-  const [sendChatMessageStream] = useChatStore(
-    (s) => [s.sendNewMessageStream],
+  const [sendChatMessageStream, regenerateMessageStream] = useChatStore(
+    (s) => [s.sendNewMessageStream, s.regenerateMessageStream],
     shallow
   )
   const [text, setText] = useState('')
@@ -69,6 +69,26 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
     }
   )
 
+  const handleRegenerateMessage = useMemoizedFn(
+    async (p: { messageId: string }) => {
+      const resp = await regenerateMessageStream({
+        chatId: chat.id,
+        messageId: p.messageId,
+      })
+
+      if (!resp.ok) {
+        enqueueSnackbar(formatErrorUserFriendly(resp.error), {
+          autoHideDuration: 3000,
+          variant: 'error',
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'center',
+          },
+        })
+      }
+    }
+  )
+
   const handleInputShortcut = useMemoizedFn(
     (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       if (e.ctrlKey && e.key == 'Enter') {
@@ -107,8 +127,10 @@ export function ChatPanel(props: { chat: chat_t.Chat }) {
                 return (
                   <ChatMessageItem
                     key={message.id}
-                    isLastOne={idx == total.length - 1}
                     message={message}
+                    onRegenerate={() => {
+                      handleRegenerateMessage({ messageId: message.id })
+                    }}
                     character={chat.character}
                   />
                 )

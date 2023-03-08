@@ -11,7 +11,7 @@ export function ChatPage() {
   // you should call dervied function in useStore, otherwise it will not be tracked
   const chat = useChatStore((s) => s.getChat(chatId || ''))
 
-  if (!chat) {
+  if (!chat || chat.deletedAt) {
     return <Navigate to="/chats" />
   }
 

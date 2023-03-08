@@ -88,7 +88,7 @@ function ChatListItem({
   }
 
   return (
-    <ListItem key={chat.id} secondaryAction={renderActions()}>
+    <ListItem secondaryAction={renderActions()}>
       <ListItemButton onClick={() => onSelectChat(chat.id)}>
         <ListItemIcon>
           <ChatIcon />
@@ -140,6 +140,7 @@ export default function ChatListPage() {
             <>
               <Divider key={`div-${chat.id}`} component="li" />
               <ChatListItem
+                key={chat.id}
                 chat={chat}
                 onSelectChat={handleSelectChat}
                 onDeleteChat={deleteChat}

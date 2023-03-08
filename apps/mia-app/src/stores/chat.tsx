@@ -86,6 +86,13 @@ const filterValidHistories = (messages: ChatMessage[]) => {
   })
 }
 
+export function isMessageLoading(message: ChatMessage) {
+  return (
+    message.loadingStatus === 'loading' ||
+    message.loadingStatus === 'wait_first'
+  )
+}
+
 interface ChatStoreState {
   chats: Chat[]
   characters: Character[]
@@ -117,7 +124,6 @@ interface ChatStoreActions {
   regenerateMessageStream(p: {
     messageId: string
     chatId: string
-    content: string
   }): Promise<Result<boolean>>
 
   // private functions
@@ -185,7 +191,7 @@ function createChatStore() {
         return 0
       })
 
-      return chats
+      return chats.filter((c) => !c.deletedAt)
     },
 
     updateChat(
@@ -238,9 +244,9 @@ function createChatStore() {
       chatId: string
       content: string
     }): Promise<Result<boolean>> {
-      const chat = get().chats.find((c) => c.id === p.chatId)
+      const chatIdx = get().chats.findIndex((c) => c.id === p.chatId)
 
-      if (!chat) {
+      if (chatIdx === -1) {
         throw new Error(`chat not found, id: ${p.chatId}`)
       }
 
@@ -249,6 +255,7 @@ function createChatStore() {
         content: p.content,
       }
 
+      const chat = get().chats[chatIdx]
       const messages = postprocessMessages({
         historyMessages: filterValidHistories(chat.messages).map((m) => ({
           role: m.role,
@@ -258,37 +265,32 @@ function createChatStore() {
         mustHaveMessages: chat.mustHaveMessages,
       })
 
-      const openaiClient = getOpenaiClient()
+      const replyMessageId = idGenerator.randomUUID(8)
+
+      const newlyAddedMessage = [
+        createChatMessageData({
+          id: idGenerator.randomUUID(8),
+          createdAt: getNowTimestamp(),
+          ...userMessage,
+        }),
+        createChatMessageData({
+          id: replyMessageId,
+          createdAt: getNowTimestamp(),
+          role: 'assistant',
+          content: '',
+        }),
+      ]
 
       set((s) => {
-        const chat = s.chats.find((c) => c.id === p.chatId)
-        if (!chat) {
-          return
-        }
+        const chat = s.chats[chatIdx]
 
-        // push user message to history
-        // push reply message to history
-        chat.messages.push(
-          createChatMessageData({
-            id: idGenerator.randomUUID(8),
-            createdAt: getNowTimestamp(),
-            ...userMessage,
-          })
-        )
-
-        chat.messages.push(
-          createChatMessageData({
-            id: idGenerator.randomUUID(8),
-            createdAt: getNowTimestamp(),
-            role: 'assistant',
-            content: '',
-          })
-        )
+        // push user & reply message to history
+        chat.messages.push(...newlyAddedMessage)
       })
 
       const resp = await get()._handleSendMessageStream({
         chatId: p.chatId,
-        messageId: chat.messages[chat.messages.length - 1].id,
+        messageId: replyMessageId,
         sendMessages: messages,
       })
 
@@ -296,14 +298,15 @@ function createChatStore() {
     },
 
     async regenerateMessageStream(p) {
-      const chat = get().chats.find((c) => c.id === p.chatId)
-
-      if (!chat) {
+      const chatIdx = get().chats.findIndex((c) => c.id === p.chatId)
+      if (chatIdx === -1) {
         return {
           ok: false,
           error: new Error(`chat not found, id: ${p.chatId}`),
         }
       }
+
+      const chat = get().chats[chatIdx]
 
       const messageIndex = chat.messages.findIndex((m) => m.id === p.messageId)
       if (messageIndex === -1) {
@@ -323,7 +326,7 @@ function createChatStore() {
         }
       }
 
-      if (message.deletedAt || message.createdAt) {
+      if (message.deletedAt || message.hiddenAt) {
         return {
           ok: false,
           error: new Error(`message is either hidden or deleted`),
@@ -331,10 +334,7 @@ function createChatStore() {
       }
 
       set((s) => {
-        const chat = s.chats.find((c) => c.id === p.chatId)
-        if (!chat) {
-          return
-        }
+        const chat = s.chats[chatIdx]
 
         // push reply message to history
         const message = chat.messages[messageIndex]
@@ -346,6 +346,7 @@ function createChatStore() {
       const historyMessages = filterValidHistories(
         chat.messages.slice(0, messageIndex)
       )
+      console.log(`message_indx=`, messageIndex, historyMessages)
       const messages = postprocessMessages({
         historyMessages: historyMessages.map((m) => ({
           role: m.role,
@@ -389,10 +390,13 @@ function createChatStore() {
             message.loadingStatus = 'loading'
           }
 
+          let newContent = ''
           // append content
           for (const event of events) {
-            message.content = event.choices[0].delta.content || ''
+            newContent += event.choices[0].delta.content || ''
           }
+
+          message.content += newContent
         })
       }
 
